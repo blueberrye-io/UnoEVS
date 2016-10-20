@@ -18,4 +18,7 @@ A C static library providing basic functionality for USART communication
 Added Executables/BB_EVS:
 C++ code for using the BB_EVS in combination with a SPI master (e.g. Uno335).
 
+Added Sketches/BB_EVS_ReadOut_Short:
+An Arduino sketch wich can be used to control a UnoEVS via SPI.
+
 # UnoEVS
