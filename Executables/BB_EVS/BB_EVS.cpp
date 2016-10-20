@@ -27,10 +27,10 @@
 #define greenLedOff PORTB &= ~(1<<PB0)
 
 extern "C" {
-	#include <avr/io.h>
+    #include <avr/io.h>
     #include <stdint.h>
-	#include <util/delay.h> // TODO remove??
-    #include <avr/power.h>  // This is needed to set the prescaler values in a reliable way!!
+    #include <util/delay.h>
+    #include <avr/power.h>  
     #include <avr/wdt.h>
     #include <avr/sleep.h>
     #include <avr/interrupt.h>
@@ -49,17 +49,16 @@ extern "C" {
  */
 void SPI_SlaveInit_woInt(void){
 
-	volatile char dummy;
+    volatile char dummy;
 
-	// Set PB4(MISO) as output - all others are input
-	DDRB |= (1 << PB4);
+    // Set PB4(MISO) as output - all others are input
+    DDRB |= (1 << PB4);
 
-	//Enable SPI in Slave Mode
-	SPCR  = (1 << SPE);
+    //Enable SPI in Slave Mode
+    SPCR  = (1 << SPE);
 
-	dummy   = SPSR;                         // Clear SPIF bit in SPSR
-	dummy   = SPDR;
-
+    dummy   = SPSR;                         // Clear SPIF bit in SPSR
+    dummy   = SPDR;
 }
 
 /**
@@ -72,10 +71,10 @@ void SPI_SlaveInit_woInt(void){
  *         for write operations: no meaning
  */
 uint8_t SPI_transferData(uint8_t inData){
-	SPDR = inData;
-	//asm volatile("nop");
-	while (!(SPSR & (1 << SPIF)));
-	return SPDR;
+    SPDR = inData;
+    //asm volatile("nop");
+    while (!(SPSR & (1 << SPIF)));
+    return SPDR;
 }
 
 // define an interrupt service routine which we will need to wake
@@ -85,14 +84,14 @@ ISR(PCINT0_vect){
 }
 
 int main(void){
-	// the processor works with 3.3V -> we need 8 MHz
-	clock_prescale_set(clock_div_2); // set MCU freq to 16/2 MHz
+    // the processor works with 3.3V -> we need 8 MHz
+    clock_prescale_set(clock_div_2); // set MCU freq to 16/2 MHz
 
-	// power saving
-	wdt_disable();  // switch off watchdog
+    // power saving
+    wdt_disable();  // switch off watchdog
 
-	// define ports
-	PORTC = 0xFF;
+    // define ports
+    PORTC = 0xFF;
     DDRD = (1 << PD6) | (1 << PD7);
     PORTD = (1 << PD1) | (1 << PD3) | (1 << PD4) | (1 << PD5);
     DDRB = (1 << PB0) | (1 << PB1);
@@ -110,7 +109,7 @@ int main(void){
     // check the initialization
     if (bme.readChipId() != 0x60){
         redLedOn;
-    	while(1);
+        while(1);
     }
     // indicates successful BME280 initialization
     greenLedOn;
@@ -121,8 +120,8 @@ int main(void){
     BB_LTR303ALS01 ltr(&i2c);
     // check the initialization
     if (ltr.readManufacturerId() != 0x05){
-      	greenLedOn;
-       	return false;
+        greenLedOn;
+        return false;
     }
     // indicates successful LTR303ALS01 initialization
     // TODO - write better code(!)
@@ -153,7 +152,7 @@ int main(void){
 
     // define variables and command codes
 
-	uint8_t newCommand = 0xFF;
+    uint8_t newCommand = 0xFF;
 
     const uint8_t cmdSleep = 0xF0;
 
@@ -161,40 +160,18 @@ int main(void){
     const uint8_t cmdBmeGetTemperature = 0x11;
     const uint8_t cmdBmeGetPressure = 0x12;
     const uint8_t cmdBmeGetHumidity = 0x13;
-    // cmds for debugging
-    const uint8_t cmdBmeDebugStart = 0x15;
-    const uint8_t cmdBmeDebugGetCalibration = 0x16;
 
     int32_t bmeTemperature = 0x10111213;
     uint32_t bmePressure = 0x14151617;
     uint32_t bmeHumidity = 0x18191A1B;
-    // variables for debugging //todo replace by struct
-    uint16_t bmeDebugCalibT1 = 0x00;
-    int16_t bmeDebugCalibT2 = 0x00;
-    int16_t bmeDebugCalibT3 = 0x00;
-    uint16_t bmeDebugCalibP1 = 0x00;
-    int16_t bmeDebugCalibP2 = 0x00;
-    int16_t bmeDebugCalibP3 = 0x00;
-    int16_t bmeDebugCalibP4 = 0x00;
-    int16_t bmeDebugCalibP5 = 0x00;
-    int16_t bmeDebugCalibP6 = 0x00;
-    int16_t bmeDebugCalibP7 = 0x00;
-    int16_t bmeDebugCalibP8 = 0x00;
-    int16_t bmeDebugCalibP9 = 0x00;
-    uint16_t bmeDebugCalibH1 = 0x00;
-    int16_t bmeDebugCalibH2 = 0x00;
-    uint16_t bmeDebugCalibH3 = 0x00;
-    int16_t bmeDebugCalibH4 = 0x00;
-    int16_t bmeDebugCalibH5 = 0x00;
-    int16_t bmeDebugCalibH6 = 0x00;
 
-	const uint8_t cmdLtrStart = 0x20;
+    const uint8_t cmdLtrStart = 0x20;
     const uint8_t cmdLtrGetCh0 = 0x21;
     const uint8_t cmdLtrGetCh1 = 0x22;
     uint16_t ltrCh0 = 0x0A0B;
     uint16_t ltrCh1 = 0x0C0D;
 
-	const uint8_t cmdMl8511Start = 0x30;
+    const uint8_t cmdMl8511Start = 0x30;
     const uint8_t cmdMl8511GetValue = 0x31;
     uint16_t ml8511UvLevel = 0x0C0D;
 
@@ -209,151 +186,78 @@ int main(void){
     sei(); // enable interrupts again
 
     while(1){
-    	newCommand = SPI_transferData(0xFF);
-    	switch(newCommand){
-    				case cmdBmeStart:
-    				    // do the measurements
-    				    bmeTemperature = bme.readTemperature();
-    				    bmePressure = bme.readPressure();
-    				    bmeHumidity = bme.readHumidity();
-    	                cli();
-    				break;
-    				case cmdBmeGetTemperature:
-    				    // send the temperature data (4 bytes)
-    					SPI_transferData((uint8_t) (bmeTemperature >> 24));
-    					SPI_transferData((uint8_t) (bmeTemperature >> 16));
-    					SPI_transferData((uint8_t) (bmeTemperature >> 8));
-    					SPI_transferData((uint8_t) bmeTemperature);
-    				break;
-    				case cmdBmeGetPressure:
-    				    // send the temperature data (4 bytes)
-    				    SPI_transferData((uint8_t) (bmePressure >> 24));
-    				    SPI_transferData((uint8_t) (bmePressure >> 16));
-    				    SPI_transferData((uint8_t) (bmePressure >> 8));
-    				    SPI_transferData((uint8_t) bmePressure);
-    				break;
-    				case cmdBmeGetHumidity:
-    				    // send the temperature data (4 bytes)
-    				    SPI_transferData((uint8_t) (bmeHumidity >> 24));
-    				    SPI_transferData((uint8_t) (bmeHumidity >> 16));
-    				    SPI_transferData((uint8_t) (bmeHumidity >> 8));
-    				    SPI_transferData((uint8_t) bmeHumidity);
-    				break;
-    				case cmdLtrStart:
-    				    ltrCh0 = ltr.readChannel0();
-    				    ltrCh1 = ltr.readChannel1();
-    	                cli();
-    				break;
-    				case cmdLtrGetCh0:
-    				    // send the visible light (2 bytes)
-    				    SPI_transferData((uint8_t) (uint8_t) (ltrCh0 >> 8));
-    				    SPI_transferData((uint8_t) ltrCh0);
-    				break;
-    				case cmdLtrGetCh1:
-    				    // send the visible light (2 bytes)
-    				    SPI_transferData((uint8_t) (uint8_t) (ltrCh1 >> 8));
-    				    SPI_transferData((uint8_t) ltrCh1);
-    				break;
-    				case cmdMl8511Start:
-    				    // do the measurements
-    					ml8511UvLevel = ml8511.readUvLevel(3);
-    	                cli();
-    				break;
-    				case cmdMl8511GetValue:
-    				    // send the uv level (2 bytes)
-    				    SPI_transferData((uint8_t) (uint8_t) (ml8511UvLevel >> 8));
-    				    SPI_transferData((uint8_t) ml8511UvLevel);
-    				break;
-    				case cmdBmeDebugStart:
-    				    // get some debug messages
-    					//todo replace by struct
-    					bmeDebugCalibT1 = bme.getCalibT1();
-    					bmeDebugCalibT2 = bme.getCalibT2();
-    					bmeDebugCalibT3 = bme.getCalibT3();
-    					bmeDebugCalibP1 = bme.getCalibP1();
-    					bmeDebugCalibP2 = bme.getCalibP2();
-    					bmeDebugCalibP3 = bme.getCalibP3();
-    					bmeDebugCalibP4 = bme.getCalibP4();
-    					bmeDebugCalibP5 = bme.getCalibP5();
-    					bmeDebugCalibP6 = bme.getCalibP6();
-    					bmeDebugCalibP7 = bme.getCalibP7();
-    					bmeDebugCalibP8 = bme.getCalibP8();
-    					bmeDebugCalibP9 = bme.getCalibP9();
-    					bmeDebugCalibH1 = bme.getCalibH1();
-    					bmeDebugCalibH2 = bme.getCalibH2();
-    					bmeDebugCalibH3 = bme.getCalibH3();
-    					bmeDebugCalibH4 = bme.getCalibH4();
-    					bmeDebugCalibH5 = bme.getCalibH5();
-    					bmeDebugCalibH6 = bme.getCalibH6();
-    	                cli();
-    				break;
-    				case cmdBmeDebugGetCalibration:
-    				    // send the debug information
-    					SPI_transferData((uint8_t) (bmeDebugCalibT1 >> 8));
-    					SPI_transferData((uint8_t) bmeDebugCalibT1);
-    					SPI_transferData((int8_t) (bmeDebugCalibT2 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibT2);
-    					SPI_transferData((int8_t) (bmeDebugCalibT3 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibT3);
-    					SPI_transferData((uint8_t) (bmeDebugCalibP1 >> 8));
-    					SPI_transferData((uint8_t) bmeDebugCalibP1);
-    					SPI_transferData((int8_t) (bmeDebugCalibP2 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP2);
-    					SPI_transferData((int8_t) (bmeDebugCalibP3 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP3);
-    					SPI_transferData((int8_t) (bmeDebugCalibP4 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP4);
-    					SPI_transferData((int8_t) (bmeDebugCalibP5 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP5);
-    					SPI_transferData((int8_t) (bmeDebugCalibP6 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP6);
-    					SPI_transferData((int8_t) (bmeDebugCalibP7 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP7);
-    					SPI_transferData((int8_t) (bmeDebugCalibP8 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP8);
-    					SPI_transferData((int8_t) (bmeDebugCalibP9 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibP9);
-    					SPI_transferData((uint8_t) (bmeDebugCalibH1 >> 8));
-    					SPI_transferData((uint8_t) bmeDebugCalibH1);
-    					SPI_transferData((int8_t) (bmeDebugCalibH2 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibH2);
-    					SPI_transferData((uint8_t) (bmeDebugCalibH3 >> 8));
-    					SPI_transferData((uint8_t) bmeDebugCalibH3);
-    					SPI_transferData((int8_t) (bmeDebugCalibH4 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibH4);
-    					SPI_transferData((int8_t) (bmeDebugCalibH5 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibH5);
-    					SPI_transferData((int8_t) (bmeDebugCalibH6 >> 8));
-    					SPI_transferData((int8_t) bmeDebugCalibH6);
-    				break;
-
-    				case cmdSleep:
-    	    		    // goto sleep
-    	    		    //redLedOff;
-    	    		    //greenLedOff;
-    	    		    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    	                power_adc_disable();
-    	    		    sleep_enable();
-
-    	    		    sei();
-    	    		    sleep_cpu();
-    	    		    sleep_disable();
-    	                //power_adc_enable();
-    	    		    if (  PINB & (1 << PB2) ){
-    	        		    // SS is high -> this was the wrong signal -> sleep again
-    	                    //power_adc_disable();
-    	        		    sleep_enable();
-    	        		    sleep_cpu();
-    	        		    sleep_disable();
-    	                    //power_adc_enable();
-    	    		    }
-
-    	                power_adc_enable();
-    	    		break;
-    			}
-
+        newCommand = SPI_transferData(0xFF);
+        switch(newCommand){
+            case cmdBmeStart:
+                // do the measurements
+                bmeTemperature = bme.readTemperature();
+                bmePressure = bme.readPressure();
+                bmeHumidity = bme.readHumidity();
+                        cli();
+            break;
+            case cmdBmeGetTemperature:
+                // send the temperature data (4 bytes)
+                SPI_transferData((uint8_t) (bmeTemperature >> 24));
+                SPI_transferData((uint8_t) (bmeTemperature >> 16));
+                SPI_transferData((uint8_t) (bmeTemperature >> 8));
+                SPI_transferData((uint8_t) bmeTemperature);
+            break;
+            case cmdBmeGetPressure:
+                // send the temperature data (4 bytes)
+                SPI_transferData((uint8_t) (bmePressure >> 24));
+                SPI_transferData((uint8_t) (bmePressure >> 16));
+                SPI_transferData((uint8_t) (bmePressure >> 8));
+                SPI_transferData((uint8_t) bmePressure);
+            break;
+            case cmdBmeGetHumidity:
+                // send the temperature data (4 bytes)
+                SPI_transferData((uint8_t) (bmeHumidity >> 24));
+                SPI_transferData((uint8_t) (bmeHumidity >> 16));
+                SPI_transferData((uint8_t) (bmeHumidity >> 8));
+                SPI_transferData((uint8_t) bmeHumidity);
+            break;
+            case cmdLtrStart:
+                ltrCh0 = ltr.readChannel0();
+                ltrCh1 = ltr.readChannel1();
+                cli();
+            break;
+            case cmdLtrGetCh0:
+                // send the visible light (2 bytes)
+                SPI_transferData((uint8_t) (uint8_t) (ltrCh0 >> 8));
+                SPI_transferData((uint8_t) ltrCh0);
+            break;
+            case cmdLtrGetCh1:
+                // send the visible light (2 bytes)
+                SPI_transferData((uint8_t) (uint8_t) (ltrCh1 >> 8));
+                SPI_transferData((uint8_t) ltrCh1);
+            break;
+            case cmdMl8511Start:
+                // do the measurements
+                ml8511UvLevel = ml8511.readUvLevel(3);
+                cli();
+            break;
+            case cmdMl8511GetValue:
+                // send the uv level (2 bytes)
+                SPI_transferData((uint8_t) (uint8_t) (ml8511UvLevel >> 8));
+                SPI_transferData((uint8_t) ml8511UvLevel);
+            break;
+            case cmdSleep:
+                set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+                power_adc_disable();
+                sleep_enable();
+                sei();
+                sleep_cpu();
+                sleep_disable();
+                if (  PINB & (1 << PB2) ){
+                    // SS is high -> this was the wrong signal -> sleep again
+                    sleep_enable();
+                    sleep_cpu();
+                    sleep_disable();
+                }
+                power_adc_enable();
+            break;
+        }
     }
-
 }
 
 
