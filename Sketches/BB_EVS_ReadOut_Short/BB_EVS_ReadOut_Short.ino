@@ -27,7 +27,7 @@ uint8_t my_Spi_transfer(uint8_t inData){
 }
 
 
-// Define codes for commands:
+// Define commands:
 
 // set the UnoEVS to sleep mode
 const uint8_t cmdSleep = 0xF0;                
@@ -81,7 +81,7 @@ void setup() {
   digitalWrite(SS, LOW);
   my_Spi_transfer(cmdSleep);
   digitalWrite(SS, HIGH);
-  Serial.println("Debug Message : Setup completed");
+  Serial.println("Setup completed");
 }
 
 void loop() {
@@ -132,9 +132,7 @@ void loop() {
     digitalWrite(SS, HIGH); 
                
     // print out the data or do some other stuff:
-    Serial.print("CH0 = ");
     Serial.print("CH0 = "); Serial.println(convertArray(ltrVisibleCh0, 2, 1.0));
-    Serial.print("CH1 = ");
     Serial.print("CH1 = "); Serial.println(convertArray(ltrVisibleCh1, 2, 1.0));
                    
     // Trigger ML8511 (UV) meaurements and get data:
@@ -154,9 +152,7 @@ void loop() {
                 
     digitalWrite(SS, HIGH); 
                 
-    Serial.print("UV = ");
-    Serial.println((((uint32_t) ml8511Value[0]) <<  8) | 
-                   ((uint32_t)  ml8511Value[1]));
+    // print out the data or do some other stuff:
     Serial.print("UV = "); Serial.println(convertArray(ml8511Value, 2, 1.0));
 
     Serial.println("--------------------------------");
@@ -173,18 +169,6 @@ void loop() {
 float convertArray(uint8_t measValues[], uint8_t dataCount, float scale){
     uint32_t tempValue = 0x00;
     for (unsigned int i = 0; i < dataCount; i++) tempValue = tempValue | ((uint32_t) measValues[i] << ( (dataCount - 1 - i) * 8));
-    /*
-    Serial.println();
-    for (int i = 0; i < dataCount; i++){
-        Serial.println(measValues[i]);
-        Serial.println((uint32_t) measValues[i]);
-        Serial.println((uint32_t) measValues[i] << ( (dataCount - 1 - i) * 8));
-        tempValue = tempValue | ((uint32_t) measValues[i] << ( (dataCount - 1 - i) * 8));
-        Serial.println(tempValue);
-        Serial.println("x-x-");
-    }
-    Serial.println();
-    */
     return tempValue * scale;
 }    
 
