@@ -1,27 +1,16 @@
-# 2016-10-20: Engelbert Mittermeier:
-Added Libraries/BB_I2C:
-A C++ static library providing basic I2C functionality for I2C masters.
+# Libraries:
 
-Added Libraries/BB_BME280:
-A C++ static library providing the basic functionality to control and read the BME280 sensor.
+C / C++ static libraries for the UnoEVS.
 
-Added Libraries/BB_LTR303ALS01:
-A C++ static library providing the basic functionality to control and read the LTR303ALS01 
-ambient light sensor.
+# Executables:
 
-Added Libraries/BB_ML8511:
-A C++ static library providing the basic functionality to control and read the ML8511 UV sensor.
+C / C++ code for the BB_EVS.
 
-Added Libraries/BB_USART:
-A C static library providing basic functionality for USART communication
+# Sketches:
 
-Added Executables/BB_EVS:
-C++ code for using the BB_EVS in combination with a SPI master (e.g. Uno335).
+Arduino sketches which can be used if the UnoEVS should be connected to an external board (e.g. an Uno335).
 
-Added Sketches/BB_EVS_ReadOut_Short:
-An Arduino sketch wich can be used to control a UnoEVS via SPI.
+# Documentation:
 
-Added Documentation/:
 Documentation of the source code of the libraries
 
-# UnoEVS
