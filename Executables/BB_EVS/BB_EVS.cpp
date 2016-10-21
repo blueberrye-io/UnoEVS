@@ -161,19 +161,19 @@ int main(void){
     const uint8_t cmdBmeGetPressure = 0x12;
     const uint8_t cmdBmeGetHumidity = 0x13;
 
-    int32_t bmeTemperature = 0x10111213;
-    uint32_t bmePressure = 0x14151617;
-    uint32_t bmeHumidity = 0x18191A1B;
+    int32_t bmeTemperature;
+    uint32_t bmePressure;
+    uint32_t bmeHumidity;
 
     const uint8_t cmdLtrStart = 0x20;
     const uint8_t cmdLtrGetCh0 = 0x21;
     const uint8_t cmdLtrGetCh1 = 0x22;
-    uint16_t ltrCh0 = 0x0A0B;
-    uint16_t ltrCh1 = 0x0C0D;
+    uint16_t ltrCh0;
+    uint16_t ltrCh1;
 
     const uint8_t cmdMl8511Start = 0x30;
     const uint8_t cmdMl8511GetValue = 0x31;
-    uint16_t ml8511UvLevel = 0x0C0D;
+    uint16_t ml8511UvLevel;
 
     // initialize interrupt handling:
 
@@ -193,7 +193,7 @@ int main(void){
                 bmeTemperature = bme.readTemperature();
                 bmePressure = bme.readPressure();
                 bmeHumidity = bme.readHumidity();
-                        cli();
+                cli();
             break;
             case cmdBmeGetTemperature:
                 // send the temperature data (4 bytes)
@@ -223,12 +223,12 @@ int main(void){
             break;
             case cmdLtrGetCh0:
                 // send the visible light (2 bytes)
-                SPI_transferData((uint8_t) (uint8_t) (ltrCh0 >> 8));
+                SPI_transferData((uint8_t) (ltrCh0 >> 8));
                 SPI_transferData((uint8_t) ltrCh0);
             break;
             case cmdLtrGetCh1:
                 // send the visible light (2 bytes)
-                SPI_transferData((uint8_t) (uint8_t) (ltrCh1 >> 8));
+                SPI_transferData((uint8_t) (ltrCh1 >> 8));
                 SPI_transferData((uint8_t) ltrCh1);
             break;
             case cmdMl8511Start:
@@ -238,7 +238,7 @@ int main(void){
             break;
             case cmdMl8511GetValue:
                 // send the uv level (2 bytes)
-                SPI_transferData((uint8_t) (uint8_t) (ml8511UvLevel >> 8));
+                SPI_transferData((uint8_t) (ml8511UvLevel >> 8));
                 SPI_transferData((uint8_t) ml8511UvLevel);
             break;
             case cmdSleep:
@@ -248,7 +248,7 @@ int main(void){
                 sei();
                 sleep_cpu();
                 sleep_disable();
-                if (  PINB & (1 << PB2) ){
+                if (PINB & (1 << PB2) ){
                     // SS is high -> this was the wrong signal -> sleep again
                     sleep_enable();
                     sleep_cpu();
